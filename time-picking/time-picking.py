@@ -41,8 +41,8 @@ def login():
     print("Log in at " + datetime.now().strftime("%H:%M:%S"))
     driver.get(login_url)
 
-    username = driver.find_element("name","_username")
-    password = driver.find_element("name","_password")
+    username = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME, "_username")))
+    password = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME,"_password")))
 
     username.send_keys(username_env)
     password.send_keys(password_env)
