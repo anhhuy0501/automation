@@ -14,6 +14,7 @@ import pytz
 import random
 from dotenv import load_dotenv
 import os
+import holidays
 
 # init driver
 chrome_options = webdriver.ChromeOptions()
@@ -33,8 +34,13 @@ password_env = os.getenv("PASSWORD")
 delay_time_env = os.getenv("DELAY_TIME")
 timesheet_url = os.getenv("TIMESHEET_URL")
 login_url = os.getenv("LOGIN_URL")
+# Load local timezone from .env
+local_timezone_env = os.getenv("LOCAL_TIMEZONE")
+
 print("login_url: " + login_url)
 print("timesheet_url: " + timesheet_url)
+# Get Vietnamese holidays
+vn_holidays = holidays.VN()
 
 def login():
     
@@ -50,6 +56,10 @@ def login():
     password.send_keys(Keys.RETURN)
 
 def check_in():
+    # Check if today is a weekday
+    if datetime.today() in vn_holidays or datetime.today().weekday() >= 5:
+        print("Today is a weekend or holiday")
+        return
     # Delay execution
     delay_random_time()
 
@@ -95,6 +105,11 @@ def check_in():
     # close_button.click()
 
 def check_out():
+    # Check if today is a weekday
+    if datetime.today() in vn_holidays or datetime.today().weekday() >= 5:
+        print("Today is a weekend or holiday")
+        return
+
     # Delay execution
     delay_random_time()
 
@@ -127,9 +142,12 @@ check_in_time_gmt7 = datetime.strptime(check_in_time_env, "%H:%M").time()
 check_out_time_gmt7 = datetime.strptime(check_out_time_env, "%H:%M").time()
 
 # Convert the time to local timezone
-local_timezone = pytz.timezone('Etc/GMT+7')  # replace with time-picking deploy machine timezone
+local_timezone = pytz.timezone(local_timezone_env)  # replace with time-picking deploy machine timezone
 check_in_time_local = gmt7_timezone.localize(datetime.combine(datetime.today(), check_in_time_gmt7)).astimezone(local_timezone).time()
 check_out_time_local = gmt7_timezone.localize(datetime.combine(datetime.today(), check_out_time_gmt7)).astimezone(local_timezone).time()
+
+print("check_in_time_local: " + str(check_in_time_local))
+print("check_out_time_local: " + str(check_out_time_local))
 
 # Schedule the tasks using the local time
 schedule.every().day.at(check_in_time_local.strftime("%H:%M")).do(check_in)
