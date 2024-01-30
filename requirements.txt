@@ -2,3 +2,4 @@ python-dotenv==1.0.1
 pytz==2023.3.post1
 schedule==1.2.1
 selenium==4.17.2
+python==3.11.5

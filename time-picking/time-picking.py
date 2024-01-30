@@ -1,7 +1,5 @@
-# This is a script to loggin to timesheet at http://54.250.59.7:81/en/login 
-# username: linhntm
-# password: 12345678
-# and use selenium to auto check in/out for the day at http://54.250.59.7:81/en/timesheet/
+# This is a script to loggin to timesheet 
+# and use selenium to auto check in/out 
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -18,7 +16,12 @@ from dotenv import load_dotenv
 import os
 
 # init driver
-driver = webdriver.Chrome()
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-gpu")
+driver = webdriver.Chrome(options=chrome_options)
+#driver = webdriver.Chrome()
 load_dotenv()
 # Get check-in and check-out times from .env file
 check_in_time_env = os.getenv("CHECK_IN_TIME")
@@ -28,12 +31,15 @@ username_env = os.getenv("USERNAME")
 password_env = os.getenv("PASSWORD")
 # Get delay time from .env file
 delay_time_env = os.getenv("DELAY_TIME")
-
+timesheet_url = os.getenv("TIMESHEET_URL")
+login_url = os.getenv("LOGIN_URL")
+print("login_url: " + login_url)
+print("timesheet_url: " + timesheet_url)
 
 def login():
     
     print("Log in at " + datetime.now().strftime("%H:%M:%S"))
-    driver.get("http://54.250.59.7:81/en/login")
+    driver.get(login_url)
 
     username = driver.find_element("name","_username")
     password = driver.find_element("name","_password")
@@ -48,7 +54,7 @@ def check_in():
     delay_random_time()
 
     print("Checking in at " + datetime.now().strftime("%H:%M:%S"))
-    driver.get("http://54.250.59.7:81/en/timesheet/")
+    driver.get(timesheet_url)
     # Find the button by its class name
     button = driver.find_element(By.CLASS_NAME,"btn-create")
     button.click()
@@ -93,7 +99,7 @@ def check_out():
     delay_random_time()
 
     print("Checking out at " + datetime.now().strftime("%H:%M:%S"))
-    driver.get("http://54.250.59.7:81/en/timesheet/")
+    driver.get(timesheet_url)
 
     # Wait for the dropdown to be clickable and click it
     dropdown = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@class='btn btn-default btn-sm dropdown-toggle']")))
