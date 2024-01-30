@@ -143,8 +143,8 @@ check_out_time_gmt7 = datetime.strptime(check_out_time_env, "%H:%M").time()
 
 # Convert the time to local timezone
 local_timezone = pytz.timezone(local_timezone_env)  # replace with time-picking deploy machine timezone
-check_in_time_local = gmt7_timezone.localize(datetime.combine(datetime.today(), check_in_time_gmt7)).astimezone(local_timezone).time()
-check_out_time_local = gmt7_timezone.localize(datetime.combine(datetime.today(), check_out_time_gmt7)).astimezone(local_timezone).time()
+check_in_time_local = local_timezone.localize(datetime.combine(datetime.today(), check_in_time_gmt7)).astimezone(gmt7_timezone).time()
+check_out_time_local = local_timezone.localize(datetime.combine(datetime.today(), check_out_time_gmt7)).astimezone(gmt7_timezone).time()
 
 print("check_in_time_local: " + str(check_in_time_local))
 print("check_out_time_local: " + str(check_out_time_local))
