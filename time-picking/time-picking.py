@@ -66,7 +66,7 @@ def check_in():
     print("Checking in at " + datetime.now().strftime("%H:%M:%S"))
     driver.get(timesheet_url)
     # Find the button by its class name
-    button = driver.find_element(By.CLASS_NAME,"btn-create")
+    button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "btn-create")))
     button.click()
 
     # Click the dropdown to select project
