@@ -1,5 +1,5 @@
-# This is a script to loggin to timesheet 
-# and use selenium to auto check in/out 
+# This is a script to loggin to timesheet
+# and use selenium to auto check in/out
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -22,14 +22,13 @@ chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
 driver = webdriver.Chrome(options=chrome_options)
-#driver = webdriver.Chrome()
 load_dotenv()
 # Get check-in and check-out times from .env file
 check_in_time_env = os.getenv("CHECK_IN_TIME")
 check_out_time_env = os.getenv("CHECK_OUT_TIME")
 # Get username and password from .env file
-username_env = os.getenv("USERNAME")
-password_env = os.getenv("PASSWORD")
+username_env = os.getenv("MY_USERNAME")
+password_env = os.getenv("MY_PASSWORD")
 # Get delay time from .env file
 delay_time_env = os.getenv("DELAY_TIME")
 timesheet_url = os.getenv("TIMESHEET_URL")
@@ -43,7 +42,7 @@ print("timesheet_url: " + timesheet_url)
 vn_holidays = holidays.VN()
 
 def login():
-    
+
     print("Log in at " + datetime.now().strftime("%H:%M:%S"))
     driver.get(login_url)
 
@@ -64,7 +63,11 @@ def check_in():
     delay_random_time()
 
     print("Checking in at " + datetime.now().strftime("%H:%M:%S"))
+    print(driver.page_source)
+    driver.save_screenshot('login.png')
     driver.get(timesheet_url)
+
+    driver.save_screenshot('timesheet_url.png')
     # Find the button by its class name
     button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "btn-create")))
     button.click()
@@ -101,8 +104,7 @@ def check_in():
     # Click save button
     save_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "form_modal_save")))
     save_button.click()
-    # close_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@data-dismiss='modal']")))
-    # close_button.click()
+    print("Save clicked.")
 
 def check_out():
     # Check if today is a weekday
@@ -123,8 +125,9 @@ def check_out():
     # Wait for the options to be visible
     option = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, '/api/timesheets/') and contains(text(), 'Stop')]")))
     option.click()
+    print("Stop clicked.")
 
-def delay_random_time():    
+def delay_random_time():
     # Generate a random delay time between 0 and delay_time_env minutes (in seconds)
     delay_time = random.randint(0, int(delay_time_env)) * 60
 
@@ -135,6 +138,7 @@ def delay_random_time():
     sleep(delay_time)
 
 login()
+check_in()
 
 # Define the time in GMT+7 timezone
 gmt7_timezone = pytz.timezone('Etc/GMT+7') # replace with your setting timezone
