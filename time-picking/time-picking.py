@@ -42,7 +42,6 @@ print("timesheet_url: " + timesheet_url)
 vn_holidays = holidays.VN()
 
 def login():
-
     print("Log in at " + datetime.now().strftime("%H:%M:%S"))
     driver.get(login_url)
 
@@ -51,7 +50,7 @@ def login():
 
     username.send_keys(username_env)
     password.send_keys(password_env)
-
+    driver.save_screenshot('login.png')
     password.send_keys(Keys.RETURN)
 
 def check_in():
@@ -62,15 +61,14 @@ def check_in():
     # Delay execution
     delay_random_time()
 
+    login()
     print("Checking in at " + datetime.now().strftime("%H:%M:%S"))
-    print(driver.page_source)
-    driver.save_screenshot('login.png')
     driver.get(timesheet_url)
-
-    driver.save_screenshot('timesheet_url.png')
+    driver.save_screenshot('timesheet_url_0.png')
     # Find the button by its class name
     button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "btn-create")))
     button.click()
+    driver.save_screenshot('timesheet_url_1.png')
 
     # Click the dropdown to select project
     dropdown = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "select2-selection--single")))
@@ -83,6 +81,7 @@ def check_in():
     # Click the desired option
     for option in options:
         if option.text == "Timekeeping":
+            WebDriverWait(driver, 10).until(EC.element_to_be_clickable(option))
             option.click()
             break
 
@@ -98,13 +97,17 @@ def check_in():
     # Click the desired option
     for option in options:
         if option.text == "WorkRemote":
+            WebDriverWait(driver, 10).until(EC.element_to_be_clickable(option))
             option.click()
+            print("Click WorkRemote")
             break
 
+    driver.save_screenshot('timesheet_url_2.png')
     # Click save button
     save_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "form_modal_save")))
     save_button.click()
     print("Save clicked.")
+    driver.save_screenshot('timesheet_url_3.png')
 
 def check_out():
     # Check if today is a weekday
@@ -115,6 +118,7 @@ def check_out():
     # Delay execution
     delay_random_time()
 
+    login()
     print("Checking out at " + datetime.now().strftime("%H:%M:%S"))
     driver.get(timesheet_url)
 
@@ -137,8 +141,8 @@ def delay_random_time():
     # Delay execution
     sleep(delay_time)
 
-login()
-check_in()
+# login()
+# check_in()
 
 # Define the time in GMT+7 timezone
 gmt7_timezone = pytz.timezone('Etc/GMT+7') # replace with your setting timezone
